@@ -27,7 +27,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='yconf',
-    version="0.1",
+    version="0.2",
     license='BSD-3',
     author='Christian Kampka',
     author_email='chris@emerge-life.de',
