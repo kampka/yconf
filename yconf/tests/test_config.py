@@ -1,0 +1,189 @@
+
+import os
+import yaml
+
+import fixtures
+from testtools import TestCase
+from testtools.matchers import LessThan
+
+from yconf.config import _Loader as Loader, BaseConfiguration
+
+
+class BaseYamlFileFixture(fixtures.Fixture):
+
+    default_config = {"production": {"a": "a", "b": "b", "c": "c"},
+                      "staging": {"b": "B"},
+                      "development": {"c": "C"}
+    }
+
+    def __init__(self, data=None):
+        super(BaseYamlFileFixture, self).__init__()
+        self.data = data or self.default_config
+
+    def setUp(self):
+        super(BaseYamlFileFixture, self).setUp()
+        self.dir = self.useFixture(fixtures.TempDir())
+
+
+class YamlFileFixture(BaseYamlFileFixture):
+
+    def __init__(self, data=None, name="config.yml"):
+        super(YamlFileFixture, self).__init__(data)
+        self.name = name
+
+    def setUp(self):
+        super(YamlFileFixture, self).setUp()
+        self.config = os.path.join(self.dir.path, self.name)
+        with open(self.config, "w") as f:
+            f.write(yaml.dump(self.data))
+
+
+class YamlConfigDirFixture(BaseYamlFileFixture):
+
+    def setUp(self):
+        super(YamlConfigDirFixture, self).setUp()
+        for key, value in self.data.iteritems():
+            with open(os.path.join(self.dir.path, "%s.yml" % key), "w") as f:
+                f.write(yaml.dump(value))
+
+
+class LoaderTest(TestCase):
+
+    def setUp(self):
+        TestCase.setUp(self)
+        self.data = {"testcase": {"test-level": 1}}
+
+    def test_constructMapping(self):
+
+        d = yaml.load(yaml.dump(self.data), Loader=Loader)
+
+        self.assertTrue("test_level" in d["testcase"])
+        self.assertEqual(d["testcase"]["test_level"],
+                        self.data["testcase"]["test-level"])
+
+
+class BaseConfigurationTest(TestCase):
+
+    def test_getEnvironment(self):
+        bc = BaseConfiguration()
+        self.assertEqual(10, bc.getEnvironment(10))
+        self.assertEqual(20, bc.getEnvironment(20))
+        self.assertEqual(30, bc.getEnvironment(30))
+
+        self.assertEqual(10, bc.getEnvironment("production"))
+        self.assertEqual(20, bc.getEnvironment("staging"))
+        self.assertEqual(30, bc.getEnvironment("development"))
+
+        self.assertThat(bc.getEnvironment("production"),
+                        LessThan(bc.getEnvironment("staging")))
+
+        self.assertThat(bc.getEnvironment("staging"),
+                        LessThan(bc.getEnvironment("development")))
+
+    def test_mergeEnvironments(self):
+        f = self.useFixture(YamlFileFixture())
+
+        bc = BaseConfiguration()
+        bc.parse(args=["-c", f.config])
+        self.assertEqual("a", bc["a"])
+        self.assertEqual("b", bc["b"])
+        self.assertEqual("c", bc["c"])
+        del bc
+
+        bc = BaseConfiguration()
+        bc.parse(args=["-c", f.config, "-e", "staging"])
+        self.assertEqual("a", bc["a"])
+        self.assertEqual("B", bc["b"])
+        self.assertEqual("c", bc["c"])
+        del bc
+
+        bc = BaseConfiguration()
+        bc.parse(args=["-c", f.config, "-e", "development"])
+        self.assertEqual("a", bc["a"])
+        self.assertEqual("B", bc["b"])
+        self.assertEqual("C", bc["c"])
+        del bc
+
+    def test_noMergeEnvironments(self):
+        f = self.useFixture(YamlFileFixture())
+
+        bc = BaseConfiguration(merge=False)
+        bc.parse(args=["-c", f.config])
+        self.assertEqual("a", bc["a"])
+        self.assertEqual("b", bc["b"])
+        self.assertEqual("c", bc["c"])
+        del bc
+
+        bc = BaseConfiguration(merge=False)
+        bc.parse(args=["-c", f.config, "-e", "staging"])
+        self.assertFalse(bc.has("a"))
+        self.assertEqual("B", bc["b"])
+        self.assertFalse(bc.has("c"))
+        del bc
+
+        bc = BaseConfiguration(merge=False)
+        bc.parse(args=["-c", f.config, "-e", "development"])
+        self.assertFalse(bc.has("a"))
+        self.assertFalse(bc.has("b"))
+        self.assertEqual("C", bc["c"])
+
+    def test_configDirectory(self):
+        f = self.useFixture(YamlConfigDirFixture())
+
+        bc = BaseConfiguration()
+        bc.parse(args=["-c", f.dir.path])
+        self.assertEqual("a", bc["a"])
+        self.assertEqual("b", bc["b"])
+        self.assertEqual("c", bc["c"])
+        del bc
+
+        bc = BaseConfiguration()
+        bc.parse(args=["-c", f.dir.path, "-e", "staging"])
+        self.assertEqual("a", bc["a"])
+        self.assertEqual("B", bc["b"])
+        self.assertEqual("c", bc["c"])
+        del bc
+
+        bc = BaseConfiguration()
+        bc.parse(args=["-c", f.dir.path, "-e", "development"])
+        self.assertEqual("a", bc["a"])
+        self.assertEqual("B", bc["b"])
+        self.assertEqual("C", bc["c"])
+
+    def test_parse(self):
+
+        class TestConfiguration(BaseConfiguration):
+
+            def makeParser(_self):
+                parser = super(TestConfiguration, _self).makeParser()
+                parser.add_argument("-a", dest="a")
+                parser.add_argument("-x", dest="x")
+                return parser
+
+        f = self.useFixture(YamlFileFixture())
+
+        bc = TestConfiguration()
+        bc.parse(args=["-c", f.config, "-e", "development", "-a", "1", "-x", "2"])
+        self.assertEqual("1", bc["a"])
+        self.assertEqual("B", bc["b"])
+        self.assertEqual("C", bc["c"])
+        self.assertEqual("2", bc["x"])
+
+    def test_parseWithoutConfig(self):
+        class TestConfiguration(BaseConfiguration):
+
+            def makeParser(_self):
+                parser = super(TestConfiguration, _self).makeParser()
+                parser.add_argument("-a", dest="a")
+                parser.add_argument("-x", dest="x")
+                return parser
+
+        bc = TestConfiguration()
+        bc.parse(args=["-a", "1", "-x", "2"])
+        self.assertEqual("1", bc["a"])
+        self.assertEqual("2", bc["x"])
+
+
+def test_suite():
+    from unittest import TestLoader
+    return TestLoader().loadTestsFromName(__name__)
