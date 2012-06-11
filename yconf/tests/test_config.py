@@ -66,7 +66,7 @@ class YamlConfigDirFixture(BaseYamlFileFixture):
 
     def setUp(self):
         super(YamlConfigDirFixture, self).setUp()
-        for key, value in self.data.iteritems():
+        for key, value in self.data.items():
             with open(os.path.join(self.dir.path, "%s.yml" % key), "w") as f:
                 f.write(yaml.dump(value))
 

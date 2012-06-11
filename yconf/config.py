@@ -24,7 +24,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import types
 import yaml
 import argparse
 
@@ -38,8 +37,8 @@ class _Loader(yaml.Loader):
 
     def construct_mapping(self, node, deep=False):
         mapping = yaml.Loader.construct_mapping(self, node, deep)
-        for key in mapping.keys():
-            if type(key) in types.StringTypes:
+        for key in mapping:
+            if type(key) == str:
                 new = key.replace("-", "_")
                 if new != key:
                     mapping[new] = mapping[key]

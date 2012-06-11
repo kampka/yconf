@@ -109,11 +109,11 @@ class ConfigEntryTest(TestCase):
         self.assertIsNone(None, nd.lookup(("a", "x", "y")))
         self.assertEqual(self.data["a"], nd.lookup(["a"]))
 
-    def test_iteritems(self):
+    def test_items(self):
 
         nd = NestedDict(self.data)
 
-        for k, v in nd.iteritems():
+        for k, v in nd.items():
             self.assertIn(k, self.data)
             self.assertEqual(self.data[k], v)
 

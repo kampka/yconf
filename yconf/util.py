@@ -23,8 +23,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import types
-
 
 class NestedDict(object):
 
@@ -35,7 +33,7 @@ class NestedDict(object):
 
     def __getitem__(self, key):
         rv = self.data[key]
-        if type(rv) in (types.DictionaryType, types.DictType):
+        if type(rv) ==dict:
             rv = NestedDict(rv)
             self.data[key] = rv
         if type(rv) is type(self) and not rv.parent:
@@ -44,7 +42,10 @@ class NestedDict(object):
         return rv
 
     def __getattr__(self, key):
-        return self[key]
+        try:
+            return self[key]
+        except KeyError as e:
+            raise AttributeError(e)
 
     def get(self, key, default=None):
         try:
@@ -67,11 +68,11 @@ class NestedDict(object):
         return self.data
 
     def update(self, other):
-        if type(other) in (types.DictType, NestedDict):
-            for (key, value) in other.iteritems():
+        if type(other) in (dict, NestedDict):
+            for (key, value) in other.items():
                 if key in self.data and \
-                   type(self[key]) in (types.DictType, NestedDict) and \
-                   type(value) in (types.DictType, NestedDict):
+                   type(self[key]) in (dict, NestedDict) and \
+                   type(value) in (dict, NestedDict):
                     self.data[key] = NestedDict(self[key])
                     object.__setattr__(self.data[key], "parent", self)
                     self.data[key].update(value)
@@ -89,8 +90,8 @@ class NestedDict(object):
     def __iter__(self):
         return self.data.__iter__()
 
-    def iteritems(self):
-        return self.data.iteritems()
+    def items(self):
+        return self.data.items()
 
     def delete(self, key):
         del self.data[key]
