@@ -128,6 +128,30 @@ class ConfigEntryTest(TestCase):
         self.assertEqual("foo", nd.get("parent"))
 
 
+    def test_in(self):
+
+        nd = NestedDict(self.data)
+        self.assertIn("a", nd)
+        self.assertNotIn("g", nd)
+
+    def test_delete(self):
+
+        nd = NestedDict(self.data)
+
+
+        self.assertIn("b", nd["a"])
+        delattr(nd["a"], "b")
+        self.assertNotIn("b", nd["a"])
+
+        self.assertIn("e", nd["a"])
+        del nd["a"]["e"]
+        self.assertNotIn("e", nd["a"])
+
+        self.assertIn("a", nd)
+        nd.delete("a")
+        self.assertNotIn("a", nd)
+
+
 def test_suite():
     from unittest import TestLoader
     return TestLoader().loadTestsFromName(__name__)

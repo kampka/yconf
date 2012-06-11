@@ -37,6 +37,7 @@ class NestedDict(object):
         rv = self.data[key]
         if type(rv) in (types.DictionaryType, types.DictType):
             rv = NestedDict(rv)
+            self.data[key] = rv
         if type(rv) is type(self) and not rv.parent:
             object.__setattr__(rv, "parent", self)
             return rv
@@ -90,5 +91,15 @@ class NestedDict(object):
 
     def iteritems(self):
         return self.data.iteritems()
+
+    def delete(self, key):
+        del self.data[key]
+
+    def __delitem__(self, key):
+        self.delete(key)
+
+    def __delattr__(self, name):
+        self.delete(name)
+
 
 __all__ = ["NestedDict"]
