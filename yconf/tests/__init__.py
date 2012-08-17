@@ -27,7 +27,7 @@ from unittest import TestSuite
 
 
 def test_suite():
-    from confparse.tests import (
+    from yconf.tests import (
         test_config,
         test_parser,
         test_util
