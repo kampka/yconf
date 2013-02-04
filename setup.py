@@ -37,6 +37,7 @@ setup(
     author_email='christian@kampka.net',
     description='Wrapper that combines argparse with yaml config files.',
     long_description=readme(),
+    url='https://github.com/kampka/yconf',
     install_requires=[
         "PyYAML >= 3.1",
     ],
@@ -46,4 +47,13 @@ setup(
     ],
     test_suite="yconf.tests",
     packages=find_packages(),
+    classifiers = [
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Topic :: Software Development',
+        ],
     )
