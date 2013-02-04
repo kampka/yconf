@@ -5,3 +5,4 @@ yconf.egg-info
 *.egg
 build
 dist
+.testrepository
