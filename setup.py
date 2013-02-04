@@ -34,7 +34,7 @@ setup(
     version="0.3",
     license='BSD-3',
     author='Christian Kampka',
-    author_email='chris@emerge-life.de',
+    author_email='christian@kampka.net',
     description='Wrapper that combines argparse with yaml config files.',
     long_description=readme(),
     install_requires=[
