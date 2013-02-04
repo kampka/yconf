@@ -1,0 +1,24 @@
+language: python
+
+python:
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "pypy"
+
+env:
+  - LIBYAML="true"
+  - LIBYAML="false"
+
+matrix:
+  exclude:
+    - python: pypy
+      env: LIBYAML="true"
+
+install:
+  - pip install -q --use-mirrors testtools fixtures
+  - if [[ $LIBYAML == 'true' ]]; then sudo apt-get -qq install libyaml-dev; fi
+  - python setup.py -q install
+
+script:
+  - python setup.py -q test
