@@ -25,6 +25,10 @@
 
 from setuptools import setup, find_packages
 
+def readme():
+        with open("README.rst") as f:
+                    return f.read()
+
 setup(
     name='yconf',
     version="0.3",
@@ -32,7 +36,7 @@ setup(
     author='Christian Kampka',
     author_email='chris@emerge-life.de',
     description='Wrapper that combines argparse with yaml config files.',
-    #long_description='Here a longer description',
+    long_description=readme(),
     install_requires=[
         "PyYAML >= 3.1",
     ],
