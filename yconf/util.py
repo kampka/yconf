@@ -102,5 +102,23 @@ class NestedDict(object):
     def __delattr__(self, name):
         self.delete(name)
 
+    def __len__(self):
+        return len(self.data)
+
+    def __repr__(self):
+        return "<NestedDict (%s)>" % repr(dict(self.items()))
+
+    def keys(self):
+        return self.data.keys()
+
+    def values(self):
+        return self.data.values()
+
+    def has_key(self, key):
+        return self.has(key)
+
+    def __contains__(self, key):
+        return self.has(key)
+
 
 __all__ = ["NestedDict"]

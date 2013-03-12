@@ -151,6 +151,61 @@ class ConfigEntryTest(TestCase):
         nd.delete("a")
         self.assertNotIn("a", nd)
 
+    def test_length(self):
+
+        nd = NestedDict(self.data)
+
+        self.assertEqual(len(nd), len(self.data))
+
+    def test_repr(self):
+
+        nd = NestedDict()
+
+        self.assertEqual(repr(nd), "<NestedDict ({})>")
+
+        nd.update(self.data)
+
+        self.assertEqual(repr(nd), "<NestedDict (%s)>" % repr(self.data))
+
+    def test_keys(self):
+
+        nd = NestedDict(self.data)
+        keys = nd.keys()
+
+        for key in keys:
+            self.assertIn(key, self.data)
+
+    def test_values(self):
+
+        nd = NestedDict(self.data)
+
+        self.assertEqual(list(self.data.values()), list(nd.values()))
+
+    def test_haskey(self):
+
+        nd = NestedDict(self.data)
+
+        for key in self.data.keys():
+            self.assertTrue(nd.has_key(key))
+
+    def test_contains(self):
+
+        nd = NestedDict(self.data)
+
+        for key in self.data.keys():
+            self.assertTrue(key in nd)
+
+    def test_mapping(self):
+
+        nd = NestedDict(self.data)
+
+        d = {}
+        for key, value in self.data.items():
+            d[key] = nd[key]
+
+        self.assertEqual(dict(nd), dict(**nd))
+        self.assertEqual(dict(nd), d)
+
 
 def test_suite():
     from unittest import TestLoader
