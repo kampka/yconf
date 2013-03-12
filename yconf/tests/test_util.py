@@ -33,7 +33,7 @@ class ConfigEntryTest(TestCase):
 
     def setUp(self):
         TestCase.setUp(self)
-        self.data = self.data = {"a": {"b": {"c": "d"}, "e": "f"}}
+        self.data = {"a": {"b": {"c": "d"}, "e": "f"}}
 
     def test_dictAccess(self):
 
@@ -127,7 +127,6 @@ class ConfigEntryTest(TestCase):
         self.assertIsNone(nd.parent)
         self.assertEqual("foo", nd.get("parent"))
 
-
     def test_in(self):
 
         nd = NestedDict(self.data)
@@ -137,7 +136,6 @@ class ConfigEntryTest(TestCase):
     def test_delete(self):
 
         nd = NestedDict(self.data)
-
 
         self.assertIn("b", nd["a"])
         delattr(nd["a"], "b")

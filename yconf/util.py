@@ -33,7 +33,7 @@ class NestedDict(object):
 
     def __getitem__(self, key):
         rv = self.data[key]
-        if type(rv) ==dict:
+        if type(rv) == dict:
             rv = NestedDict(rv)
             self.data[key] = rv
         if type(rv) is type(self) and not rv.parent:
@@ -71,8 +71,8 @@ class NestedDict(object):
         if type(other) in (dict, NestedDict):
             for (key, value) in other.items():
                 if key in self.data and \
-                   type(self[key]) in (dict, NestedDict) and \
-                   type(value) in (dict, NestedDict):
+                    type(self[key]) in (dict, NestedDict) and \
+                        type(value) in (dict, NestedDict):
                     self.data[key] = NestedDict(self[key])
                     object.__setattr__(self.data[key], "parent", self)
                     self.data[key].update(value)
