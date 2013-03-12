@@ -31,7 +31,7 @@ def readme():
 
 setup(
     name='yconf',
-    version="0.3.1",
+    version="0.3.2",
     license='BSD-3',
     author='Christian Kampka',
     author_email='christian@kampka.net',
