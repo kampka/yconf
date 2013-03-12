@@ -42,17 +42,17 @@ Configuration
     # production environment
     config.rundir: /var/run/example
     config.database: /var/lib/example/db.sqlite
-    loglevel: warning
+    config.loglevel: warning
 
     # staging environment
     config.rundir: /var/run/example
     config.database: :memory:
-    loglevel: warning
+    config.loglevel: warning
 
     # development environment
     config.rundir: /var/run/example
     config.database: :memory:
-    loglevel: debug
+    config.loglevel: debug
 
 Both `staging` and `development` environments are optional.
 
