@@ -92,7 +92,7 @@ class BaseConfiguration(NestedDict):
                                         choices=("production", "staging", "development"),
                                         help="The environment used for configuration. (default: production)")
 
-        parser = argparse.ArgumentParser(parents=[self._configParser])
+        parser = argparse.ArgumentParser(parents=[self._configParser], argument_default=argparse.SUPPRESS)
         return parser
 
     def parse(self, args):

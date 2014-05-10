@@ -27,8 +27,8 @@ import os
 import yaml
 
 import fixtures
-from testtools import TestCase
-from testtools.matchers import LessThan
+from testtools import TestCase, ExpectedException
+from testtools.matchers import LessThan, HasLength
 
 from yconf.config import _Loader as Loader, BaseConfiguration
 
@@ -192,6 +192,27 @@ class BaseConfigurationTest(TestCase):
         self.assertEqual("B", bc["b"])
         self.assertEqual("C", bc["c"])
         self.assertEqual("2", bc["x"])
+
+    def test_parse_default_args(self):
+
+        class TestConfiguration(BaseConfiguration):
+
+            def makeParser(_self):
+                parser = super(TestConfiguration, _self).makeParser()
+                parser.add_argument("-a", dest="a")
+                parser.add_argument("-b", dest="b")
+                parser.add_argument("-x", dest="x")
+                return parser
+
+        f = self.useFixture(YamlFileFixture())
+        bc = TestConfiguration()
+        bc.parse(args=["-c", f.config, "-e", "development", "-a", "1"])
+
+        with ExpectedException(KeyError):
+            bc["x"]
+
+        self.assertEqual("1", bc["a"])
+        self.assertEqual("B", bc["b"])
 
     def test_parseWithoutConfig(self):
         class TestConfiguration(BaseConfiguration):
