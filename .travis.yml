@@ -12,11 +12,6 @@ env:
   - LIBYAML="true"
   - LIBYAML="false"
 
-matrix:
-  exclude:
-    - python: pypy
-      env: LIBYAML="true"
-
 install:
   - pip install -q --use-mirrors testtools fixtures
   - if [[ $LIBYAML == 'true' ]]; then sudo apt-get -qq install libyaml-dev; fi
