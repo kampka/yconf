@@ -6,3 +6,4 @@ yconf.egg-info
 build
 dist
 .testrepository
+.tox
