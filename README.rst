@@ -1,5 +1,6 @@
 yconf
 =====
+|Travis|_
 
 A wrapper for combining yaml configuration files and command line argument parsing.
 It builds upon PyYAML_ for parsing yaml config files and argparse_ for handling command line arguments and adds the clue produce one unified program configuration.
@@ -105,7 +106,7 @@ Argument
 
     parser.add_argument("--log-level", dest="logging.loglevel")
 
- 
+
 Accessing Configuration
 -----------------------
 
@@ -123,5 +124,5 @@ Configuration can be accessed either by attribute or by key.
 
 .. _PyYAML: http://pyyaml.org/
 .. _argparse: http://pypi.python.org/pypi/argparse
-
-.. image:: https://travis-ci.org/kampka/yconf.png?branch=master
+.. |Travis| image:: https://travis-ci.org/kampka/yconf.png?branch=master
+.. _Travis: https://travis-ci.org/kampka/yconf/jobs/167164716#

@@ -14,7 +14,7 @@ env:
   - LIBYAML="false"
 
 install:
-  - pip install -q --use-mirrors testtools fixtures
+  - pip install -q testtools fixtures
   - if [[ $LIBYAML == 'true' ]]; then sudo apt-get -qq install libyaml-dev; fi
   - python setup.py -q install
 
