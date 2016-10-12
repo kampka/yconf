@@ -35,12 +35,24 @@ class ConfigEntryTest(TestCase):
         TestCase.setUp(self)
         self.data = {"a": {"b": {"c": "d"}, "e": "f"}}
 
+    def nestedToDict(self, nested):
+        if type(nested) not in (NestedDict, dict):
+            self.fail("Unexprected type %s, expected NestedDict" % type(nested))
+
+        result = {}
+        for (key, value) in nested.items():
+            if type(value) is NestedDict:
+                result[key] = self.nestedToDict(value)
+            else:
+                result[key] = value
+        return result
+
     def test_dictAccess(self):
 
         nd = NestedDict(self.data)
 
         self.assertThat(nd["a"], IsInstance(NestedDict))
-        self.assertEqual(nd["a"].data, self.data["a"])
+        self.assertEqual(self.nestedToDict(nd["a"].data), self.data["a"])
         self.assertEqual(nd["a"]["e"], "f")
         self.assertEqual(nd["a"]["b"]["c"], "d")
 
@@ -48,7 +60,7 @@ class ConfigEntryTest(TestCase):
         nd = NestedDict(self.data)
 
         self.assertThat(nd.a, IsInstance(NestedDict))
-        self.assertEqual(nd.a.data, self.data["a"])
+        self.assertEqual(self.nestedToDict(nd.a.data), self.data["a"])
         self.assertEqual(nd.a.e, nd["a"]["e"])
         self.assertEqual(nd.a.b.c, "d")
 
@@ -63,7 +75,7 @@ class ConfigEntryTest(TestCase):
         nd = NestedDict(self.data)
 
         self.assertThat(nd.get("a"), IsInstance(NestedDict))
-        self.assertEqual(nd.get("a").data, self.data["a"])
+        self.assertEqual(self.nestedToDict(nd.get("a").data), self.data["a"])
         self.assertEqual(nd.get("a").get("e"), nd["a"]["e"])
         self.assertEqual(nd.a.get("b").c, "d")
 
@@ -82,8 +94,8 @@ class ConfigEntryTest(TestCase):
 
         nd = NestedDict(self.data)
 
-        self.assertEqual(self.data, nd())
-        self.assertEqual(self.data["a"], nd.a())
+        self.assertEqual(self.data, self.nestedToDict(nd()))
+        self.assertEqual(self.data["a"], self.nestedToDict(nd.a()))
 
     def test_update(self):
 
@@ -107,7 +119,7 @@ class ConfigEntryTest(TestCase):
 
         self.assertEqual("d", nd.lookup(("a", "b", "c")))
         self.assertIsNone(None, nd.lookup(("a", "x", "y")))
-        self.assertEqual(self.data["a"], nd.lookup(["a"]))
+        self.assertEqual(self.data["a"], self.nestedToDict(nd.lookup(["a"])))
 
     def test_items(self):
 
@@ -115,7 +127,7 @@ class ConfigEntryTest(TestCase):
 
         for k, v in nd.items():
             self.assertIn(k, self.data)
-            self.assertEqual(self.data[k], v)
+            self.assertEqual(self.data[k], self.nestedToDict(v))
 
     def test_parent(self):
 
@@ -163,7 +175,7 @@ class ConfigEntryTest(TestCase):
 
         nd.update(self.data)
 
-        self.assertEqual(repr(nd), "<NestedDict (%s)>" % repr(self.data))
+        self.assertEqual(repr(nd), "<NestedDict (%s)>" % repr(nd.data))
 
     def test_keys(self):
 
@@ -177,7 +189,7 @@ class ConfigEntryTest(TestCase):
 
         nd = NestedDict(self.data)
 
-        self.assertEqual(list(self.data.values()), list(nd.values()))
+        self.assertEqual(list(self.data.values()), [self.nestedToDict(x) for x in nd.values()])
 
     def test_haskey(self):
 
@@ -204,6 +216,15 @@ class ConfigEntryTest(TestCase):
         self.assertEqual(dict(nd), dict(**nd))
         self.assertEqual(dict(nd), d)
 
+
+    def test_hasattr(self):
+        nd = NestedDict(self.data)
+
+        self.assertTrue(hasattr(nd, "a"))
+        self.assertTrue(hasattr(nd, "a.e"))
+        self.assertTrue(hasattr(nd, "a.b.c"))
+        self.assertFalse(hasattr(nd, "b"))
+        self.assertFalse(hasattr(nd, "a.b.c.d"))
 
 def test_suite():
     from unittest import TestLoader

@@ -35,7 +35,7 @@ from yconf.config import _Loader as Loader, BaseConfiguration
 
 class BaseYamlFileFixture(fixtures.Fixture):
 
-    default_config = {"production": {"a": "a", "b": "b", "c": "c"},
+    default_config = {"production": {"a": "a", "b": "b", "c": "c", "e" : { "f": "g" }},
                       "staging": {"b": "B"},
                       "development": {"c": "C"}
     }
@@ -227,6 +227,32 @@ class BaseConfigurationTest(TestCase):
         bc.parse(args=["-a", "1", "-x", "2"])
         self.assertEqual("1", bc["a"])
         self.assertEqual("2", bc["x"])
+
+    def test_config_before_defaults(self):
+        """
+        In cases where an argument is unfulfilled but defaulted in the arg parser,
+        the config file should take precedence over parser defaults.
+        """
+        f = self.useFixture(YamlConfigDirFixture())
+
+        class TestConfiguration(BaseConfiguration):
+
+            def makeParser(_self):
+                parser = super(TestConfiguration, _self).makeParser()
+                parser.add_argument("-a", dest="e.f", default="x")
+                parser.add_argument("-b", dest="a", default="b")
+                parser.add_argument("-x", dest="c.c", default="c")
+                parser.add_argument("-y", dest="x", default="y")
+
+
+                return parser
+
+        bc = TestConfiguration()
+        bc.parse(args=["-c", f.dir.path])
+        self.assertEqual("a", bc.a)
+        self.assertEqual("g", bc.e.f)
+        self.assertEqual("c", bc.c.c)
+        self.assertEqual("y", bc.x)
 
 
 def test_suite():

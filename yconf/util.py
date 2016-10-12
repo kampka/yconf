@@ -33,17 +33,21 @@ class NestedDict(object):
 
     def __getitem__(self, key):
         rv = self.data[key]
-        if type(rv) == dict:
-            rv = NestedDict(rv)
-            self.data[key] = rv
         if type(rv) is type(self) and not rv.parent:
             object.__setattr__(rv, "parent", self)
             return rv
         return rv
 
     def __getattr__(self, key):
+        keys = key.split(".")
         try:
-            return self[key]
+            r = self[keys[0]]
+            if not len(keys[1:]):
+                return r
+            if type(r) not in (dict, NestedDict):
+                raise AttributeError("No attribute found for %s" % keys[1:])
+
+            return getattr(r, ".".join(keys[1:]))
         except KeyError as e:
             raise AttributeError(e)
 
@@ -77,7 +81,10 @@ class NestedDict(object):
                     object.__setattr__(self.data[key], "parent", self)
                     self.data[key].update(value)
                 else:
-                    self.data[key] = value
+                    if type(value) is dict:
+                        self.data[key] = NestedDict(value)
+                    else:
+                        self.data[key] = value
         else:
             self.data.update(other)
 
