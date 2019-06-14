@@ -1,18 +1,35 @@
 language: python
 
-python:
-  - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "pypy"
-  - "pypy3"
-
-env:
-  - LIBYAML="true"
-  - LIBYAML="false"
+matrix:
+  include:
+    - python: pypy
+      env: LIBYAML="true"
+    - python: pypy
+      env: LIBYAML="false"
+    - python: pypy3
+      env: LIBYAML="false"
+    - python: pypy3
+      env: LIBYAML="true"
+    - python: 2.7
+      env: LIBYAML="false"
+    - python: 2.7
+      env: LIBYAML="true"
+    - python: 3.5
+      env: LIBYAML="false"
+    - python: 3.5
+      env: LIBYAML="true"
+    - python: 3.6
+      env: LIBYAML="false"
+    - python: 3.6
+      env: LIBYAML="true"
+    - python: 3.7
+      dist: xenial
+      sudo: true
+      env: LIBYAML="false"
+    - python: 3.7
+      dist: xenial
+      sudo: true
+      env: LIBYAML="true"
 
 install:
   - pip install -q testtools fixtures

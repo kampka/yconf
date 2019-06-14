@@ -30,13 +30,13 @@ import argparse
 from yconf.util import NestedDict
 
 
-class _Loader(yaml.Loader):
+class _Loader(yaml.SafeLoader):
 
     def __init__(self, *args, **kwargs):
-        yaml.Loader.__init__(self, *args, **kwargs)
+        super(_Loader, self).__init__(*args, **kwargs)
 
     def construct_mapping(self, node, deep=False):
-        mapping = yaml.Loader.construct_mapping(self, node, deep)
+        mapping = super(_Loader, self).construct_mapping(node, deep)
         for key in mapping:
             if type(key) == str:
                 new = key.replace("-", "_")
