@@ -39,11 +39,13 @@ class _Loader(yaml.SafeLoader):
         result = dict()
         mapping = super(_Loader, self).construct_mapping(node, deep)
         for key, value in mapping.items():
-            if type(key) == str:
+            result[key] = value
+            if type(key) == str and "-" in key:
+                print(mapping)
                 new = key.replace("-", "_")
+                if new in mapping:
+                    raise Exception("Key '%s' causes a mapping conflict with key '%s'." % (new, key))
                 result[new] = value
-            else:
-                result[key] = value
         return result
 
 

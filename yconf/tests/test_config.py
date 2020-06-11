@@ -85,6 +85,12 @@ class LoaderTest(TestCase):
         self.assertEqual(d["testcase"]["test_level"],
                         self.data["testcase"]["test-level"])
 
+    def test_throwOnMappingConflict(self):
+
+        data = {"testcase": {"test-level": 1, "test_level": 2}}
+
+        with ExpectedException(Exception, ".+'test_level'.+'test-level'.+"):
+            yaml.load(yaml.dump(data), Loader=Loader)
 
 class BaseConfigurationTest(TestCase):
 
