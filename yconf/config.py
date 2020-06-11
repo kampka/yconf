@@ -36,14 +36,15 @@ class _Loader(yaml.SafeLoader):
         super(_Loader, self).__init__(*args, **kwargs)
 
     def construct_mapping(self, node, deep=False):
+        result = dict()
         mapping = super(_Loader, self).construct_mapping(node, deep)
-        for key in mapping:
+        for key, value in mapping.items():
             if type(key) == str:
                 new = key.replace("-", "_")
-                if new != key:
-                    mapping[new] = mapping[key]
-                    del mapping[key]
-        return mapping
+                result[new] = value
+            else:
+                result[key] = value
+        return result
 
 
 PRODUCTION  = 10
