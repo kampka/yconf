@@ -30,6 +30,14 @@ matrix:
       dist: xenial
       sudo: true
       env: LIBYAML="true"
+    - python: 3.8
+      dist: xenial
+      sudo: true
+      env: LIBYAML="false"
+    - python: 3.8
+      dist: xenial
+      sudo: true
+      env: LIBYAML="true"
 
 install:
   - pip install -q testtools fixtures
