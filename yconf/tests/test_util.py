@@ -113,6 +113,18 @@ class ConfigEntryTest(TestCase):
         self.assertEqual(nd.a.g, "h")
         self.assertEqual(nd.a.e, "f")
 
+    def test_setdefault(self):
+
+        nd = NestedDict()
+
+        self.assertFalse(nd.get("a", None))
+        self.assertEquals(nd.setdefault("a", "b"), "b")
+        self.assertEquals(nd["a"], "b")
+        self.assertEquals(nd.setdefault("a", "c"), "b")
+
+        self.assertEquals(nd.setdefault("b.c", "d"), "d")
+        self.assertEquals(nd.b.c, "d")
+
     def test_lookup(self):
 
         nd = NestedDict(self.data)
@@ -215,7 +227,6 @@ class ConfigEntryTest(TestCase):
 
         self.assertEqual(dict(nd), dict(**nd))
         self.assertEqual(dict(nd), d)
-
 
     def test_hasattr(self):
         nd = NestedDict(self.data)

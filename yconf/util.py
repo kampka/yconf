@@ -68,6 +68,12 @@ class NestedDict(object):
     def __setitem__(self, key, value):
         return self.__setattr__(key, value)
 
+    def setdefault(self, key, default=None):
+        if key in self:
+            return self[key]
+        self[key] = default
+        return default
+
     def has(self, key):
         return key in self.data
 
