@@ -226,6 +226,16 @@ class ConfigEntryTest(TestCase):
         self.assertFalse(hasattr(nd, "b"))
         self.assertFalse(hasattr(nd, "a.b.c.d"))
 
+    def test_setitem(self):
+        nd = NestedDict(self.data)
+
+        nd['a'] = 'b'
+        self.assertEqual(nd.a, 'b')
+
+        nd['a.b.c'] = 'd'
+        self.assertTrue(hasattr(nd, "a.b.c"))
+        self.assertEqual(nd.a.b.c, 'd')
+
 def test_suite():
     from unittest import TestLoader
     return TestLoader().loadTestsFromName(__name__)
