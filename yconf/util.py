@@ -65,6 +65,9 @@ class NestedDict(object):
         d[keys[-1]] = value
         self.update(r)
 
+    def __setitem__(self, key, value):
+        return self.__setattr__(key, value)
+
     def has(self, key):
         return key in self.data
 
