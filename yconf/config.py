@@ -41,7 +41,6 @@ class _Loader(yaml.SafeLoader):
         for key, value in mapping.items():
             result[key] = value
             if type(key) == str and "-" in key:
-                print(mapping)
                 new = key.replace("-", "_")
                 if new in mapping:
                     raise Exception("Key '%s' causes a mapping conflict with key '%s'." % (new, key))
