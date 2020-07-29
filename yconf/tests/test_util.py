@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from testtools import TestCase
-from testtools.matchers import IsInstance
+from testtools.matchers import IsInstance, KeysEqual
 
 from yconf.util import NestedDict
 
@@ -112,6 +112,17 @@ class ConfigEntryTest(TestCase):
         self.assertEqual(nd.a.b.i, "j")
         self.assertEqual(nd.a.g, "h")
         self.assertEqual(nd.a.e, "f")
+
+    def test_nested_update(self):
+
+        nd = NestedDict({"a.b": "c"})
+
+        self.assertEquals(nd.a.b, "c")
+        nd.update({"a.b": {"d": "e"}})
+        self.assertThat(nd.a.b, KeysEqual({"d": "e"}))
+
+        nd.update({"a": "d"})
+        self.assertEquals(nd.a, "d")
 
     def test_setdefault(self):
 
