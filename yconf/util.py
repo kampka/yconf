@@ -58,15 +58,10 @@ class NestedDict(object):
             return default
 
     def __setattr__(self, key, value):
-        r = d = {}
-        keys = key.split(".")
-        for k in keys[:-1]:
-            d = d.setdefault(k, {})
-        d[keys[-1]] = value
-        self.update(r)
+        self.update({key: value})
 
     def __setitem__(self, key, value):
-        return self.__setattr__(key, value)
+        self.update({key: value})
 
     def setdefault(self, key, default=None):
         if key in self:
@@ -81,21 +76,21 @@ class NestedDict(object):
         return self.data
 
     def update(self, other):
-        if type(other) in (dict, NestedDict):
-            for (key, value) in other.items():
-                if key in self.data and \
-                    type(self[key]) in (dict, NestedDict) and \
-                        type(value) in (dict, NestedDict):
-                    self.data[key] = NestedDict(self[key])
-                    object.__setattr__(self.data[key], "parent", self)
-                    self.data[key].update(value)
+        for (key, value) in other.items():
+            value = NestedDict(value) if type(value) is dict else value
+            if key in self.data and \
+                type(self[key]) in (dict, NestedDict) and \
+                    type(value) in (dict, NestedDict):
+                self.data[key] = NestedDict(self[key])
+                object.__setattr__(self.data[key], "parent", self)
+                self.data[key].update(value)
+            else:
+                if '.' in key:
+                    key, remainder = key.split('.', 1)
+                    d = NestedDict({remainder: value})
+                    self.data[key] = d
                 else:
-                    if type(value) is dict:
-                        self.data[key] = NestedDict(value)
-                    else:
-                        self.data[key] = value
-        else:
-            self.data.update(other)
+                    self.data[key] = value
 
     def lookup(self, path, default=None):
         b = self.data.copy()
