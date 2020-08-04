@@ -78,6 +78,10 @@ class NestedDict(object):
     def update(self, other):
         for (key, value) in other.items():
             value = NestedDict(value) if type(value) is dict else value
+
+            if '.' in key:
+                key, remainder = key.split('.', 1)
+                value = NestedDict({remainder: value})
             if key in self.data and \
                 type(self[key]) in (dict, NestedDict) and \
                     type(value) in (dict, NestedDict):
@@ -85,12 +89,7 @@ class NestedDict(object):
                 object.__setattr__(self.data[key], "parent", self)
                 self.data[key].update(value)
             else:
-                if '.' in key:
-                    key, remainder = key.split('.', 1)
-                    d = NestedDict({remainder: value})
-                    self.data[key] = d
-                else:
-                    self.data[key] = value
+                self.data[key] = value
 
     def lookup(self, path, default=None):
         b = self.data.copy()

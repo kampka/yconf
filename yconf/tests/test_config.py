@@ -260,6 +260,22 @@ class BaseConfigurationTest(TestCase):
         self.assertEqual("c", bc.c.c)
         self.assertEqual("y", bc.x)
 
+    def test_config_merge_args(self):
+
+        class TestConfiguration(BaseConfiguration):
+
+            def makeParser(_self):
+                parser = super(TestConfiguration, _self).makeParser()
+                parser.add_argument("-a", dest="a.a", default="a")
+                parser.add_argument("-b", dest="a.b", default="b")
+
+                return parser
+
+        bc = TestConfiguration()
+        bc.parse(args = [])
+        self.assertEqual("a", bc.a.a)
+        self.assertEqual("b", bc.a.b)
+
 
 def test_suite():
     from unittest import TestLoader
