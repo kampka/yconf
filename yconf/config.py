@@ -110,12 +110,12 @@ class BaseConfiguration(NestedDict):
         path = os.path.abspath(self.configPath)
         if os.path.isfile(path):
             with open(path, "r") as f:
-                d = yaml.load(f.read(), Loader=_Loader)
+                d = (yaml.load(f.read(), Loader=_Loader) or {})
         elif os.path.isdir(self.configPath):
             for e in self._environments:
                 if os.path.exists(os.path.join(path, "%s.yml" % e)):
                     with open(os.path.join(path, "%s.yml" % e), "r") as f:
-                        d[e] = yaml.load(f.read(), Loader=_Loader)
+                        d[e] = (yaml.load(f.read(), Loader=_Loader) or {})
         if self.merge:
             for e in self._environments:
                 if e in d and self.getEnvironment(e) <= self.getEnvironment(self.environment):

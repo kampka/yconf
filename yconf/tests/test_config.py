@@ -234,6 +234,25 @@ class BaseConfigurationTest(TestCase):
         self.assertEqual("1", bc["a"])
         self.assertEqual("2", bc["x"])
 
+    def test_ignoreEmptyConfig(self):
+        """
+        In cases where configuration file on the stack is empty,
+        the loader should handle it gracefully
+        """
+        f = self.useFixture(YamlConfigDirFixture(data={"production": None}))
+
+        class TestConfiguration(BaseConfiguration):
+
+            def makeParser(_self):
+                parser = super(TestConfiguration, _self).makeParser()
+                parser.add_argument("-a", dest="a", default="a")
+
+                return parser
+
+        bc = TestConfiguration()
+        bc.parse(args=["-c", f.dir.path])
+        self.assertEqual("a", bc.a)
+
     def test_config_before_defaults(self):
         """
         In cases where an argument is unfulfilled but defaulted in the arg parser,
